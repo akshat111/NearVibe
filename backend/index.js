@@ -3,9 +3,10 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const connectDB = require("./config/db");
 
-dotenv.config();
-
 const authRoutes = require("./routes/authRoutes");
+const eventRoutes = require("./routes/eventRoutes");
+
+dotenv.config();
 
 const app = express();
 
@@ -30,6 +31,9 @@ app.get("/api/health", (req, res) => {
 
 // routes
 app.use("/api/auth", authRoutes);
+
+// events
+app.use("/api/events", eventRoutes);
 
 const PORT = process.env.PORT || 5000;
 
