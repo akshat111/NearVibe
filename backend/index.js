@@ -5,6 +5,7 @@ const connectDB = require("./config/db");
 
 const authRoutes = require("./routes/authRoutes");
 const eventRoutes = require("./routes/eventRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 
 dotenv.config();
 
@@ -17,6 +18,9 @@ app.use(
     credentials: true,
   })
 );
+app.use("/api/admin", adminRoutes);
+
+// Connect to database  
 
 connectDB();
 
