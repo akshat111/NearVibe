@@ -6,6 +6,8 @@ const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const eventRoutes = require("./routes/eventRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const verifyRoutes = require("./routes/verifyRoutes");
+const buddyRoutes = require("./routes/buddyRoutes");
 
 dotenv.config();
 
@@ -19,6 +21,8 @@ app.use(
   })
 );
 app.use("/api/admin", adminRoutes);
+app.use("/api/verify", verifyRoutes);
+app.use("/api/buddies", buddyRoutes);
 
 // Connect to database  
 

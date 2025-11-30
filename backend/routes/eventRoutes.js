@@ -8,6 +8,7 @@ const {
   getMyEvents,
   updateEvent,
   toggleInterest,
+  checkInToEvent,
 } = require("../controllers/eventController");
 
 const { protect } = require("../middleware/authMiddleware");
@@ -24,5 +25,6 @@ router.patch("/:id", protect, requireOrganiser, updateEvent);
 
 // users (logged-in) interest toggle
 router.post("/:id/interest", protect, toggleInterest);
+router.post("/:id/check-in", protect, checkInToEvent);
 
 module.exports = router;

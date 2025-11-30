@@ -36,6 +36,12 @@ const eventSchema = new mongoose.Schema(
       },
     ],
     checkInsCount: { type: Number, default: 0 },
+     checkedInUsers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
   },
   { timestamps: true }
 );

@@ -14,7 +14,7 @@ const userSchema = new mongoose.Schema(
       enum: ["user", "organiser", "admin"],
       default: "user",
     },
-
+    //trust System
     trustScore: { type: Number, default: 0 },
     badge: {
       type: String,
@@ -25,6 +25,11 @@ const userSchema = new mongoose.Schema(
     isPhoneVerified: { type: Boolean, default: false },
     isInstagramVerified: { type: Boolean, default: false },
     isDigiLockerVerified: { type: Boolean, default: false },
+
+    instagramHandle: { type: String, default: "" },
+
+     // ✅ check-in based trust (max 3 * 10 = 30)
+    eventCheckIns: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

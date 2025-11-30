@@ -1,4 +1,6 @@
 const Event = require("../models/Event");
+const User = require("../models/User");
+const { TRUST_POINTS, addTrustPoints } = require("../utils/trustScore");
 
 // POST /api/events  (organiser only)
 exports.createEvent = async (req, res) => {
@@ -202,4 +204,66 @@ exports.toggleInterest = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-// POST /api/events/:id/checkin  (user: check-in)
+
+// POST /api/events/:id/check-in  (user)
+exports.checkInToEvent = async (req, res) => {
+  try {
+    const eventId = req.params.id;
+    const userId = req.user._id;
+
+    const event = await Event.findById(eventId);
+    if (!event || event.isArchived) {
+      return res.status(404).json({ message: "Event not found" });
+    }
+
+    if (!event.isApproved) {
+      return res.status(400).json({ message: "Event not yet approved" });
+    }
+
+    // user already checked-in?
+    const alreadyCheckedIn = event.checkedInUsers
+      .map((id) => id.toString())
+      .includes(userId.toString());
+
+    if (alreadyCheckedIn) {
+      return res.status(400).json({ message: "Already checked in for this event" });
+    }
+
+    // add check-in to event
+    event.checkedInUsers.push(userId);
+    event.checkInsCount = (event.checkInsCount || 0) + 1;
+    await event.save();
+
+    // update user's trust
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // max 3 check-ins for trust (10 * 3 = 30)
+    if ((user.eventCheckIns || 0) < 3) {
+      user.eventCheckIns = (user.eventCheckIns || 0) + 1;
+      addTrustPoints(user, TRUST_POINTS.checkIn);
+      await user.save();
+
+      return res.json({
+        message: "Check-in successful, trust score updated",
+        trustScore: user.trustScore,
+        badge: user.badge,
+        checkInsCount: event.checkInsCount,
+      });
+    } else {
+      // trust score max ho chuka for check-ins, but check-in allowed
+      await user.save();
+      return res.json({
+        message: "Check-in successful (max trust from check-ins already reached)",
+        trustScore: user.trustScore,
+        badge: user.badge,
+        checkInsCount: event.checkInsCount,
+      });
+    }
+  } catch (err) {
+    console.error("checkInToEvent error:", err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
